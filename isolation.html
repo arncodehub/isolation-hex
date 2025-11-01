@@ -98,6 +98,11 @@
       animation: pulse1 1s ease-in-out infinite alternate;
     }
 
+    .move-indicator {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
     .active2 {
       filter: drop-shadow(var(--glow2));
       animation: pulse2 1s ease-in-out infinite alternate;
@@ -209,6 +214,38 @@
       pawn.setAttribute("cy", y);
     }
 
+    // Move indicator system
+    let moveIndicators = [];
+
+    function clearMoveIndicators() {
+      moveIndicators.forEach(indicator => svg.removeChild(indicator));
+      moveIndicators = [];
+    }
+
+    function showMoveIndicators() {
+      clearMoveIndicators();
+      
+      if (phase !== "move" || botThinking || isBot(turn)) return;
+      
+      const current = turn === 1 ? p1 : p2;
+      const moves = validMoves(current.q, current.r);
+      const color = turn === 1 ? 
+        getComputedStyle(document.documentElement).getPropertyValue("--player1") :
+        getComputedStyle(document.documentElement).getPropertyValue("--player2");
+      
+      moves.forEach(move => {
+        const { x, y } = hexToPixel(move.q, move.r);
+        const indicator = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        indicator.setAttribute("cx", x);
+        indicator.setAttribute("cy", y);
+        indicator.setAttribute("r", size * 0.15);
+        indicator.setAttribute("fill", color);
+        indicator.classList.add("move-indicator");
+        svg.appendChild(indicator);
+        moveIndicators.push(indicator);
+      });
+    }
+
     // Bot System
     function isBot(player) {
       const select = document.getElementById(`player${player}Type`);
@@ -228,6 +265,7 @@
 
       document.getElementById("statusText").textContent =
         `Player ${turn} (Bot) is thinking...`;
+      clearMoveIndicators();
 
       setTimeout(() => {
         let move;
@@ -245,6 +283,7 @@
         }
 
         botThinking = false;
+        showMoveIndicators();
       }, difficulty === "easy" ? 200 : difficulty === "normal" ? 500 : 1500);
     }
 
@@ -537,6 +576,7 @@
       const phaseText = phase === "move" ? "Move" : "Choose cell to destroy";
       document.getElementById("statusText").textContent =
         `Player ${turn}’s turn — ${phaseText}`;
+      showMoveIndicators();
     }
 
     function isBlocked(q, r) {
@@ -674,6 +714,9 @@
     };
 
     resetGame();
+    
+    // Ensure indicators show on initial load
+    setTimeout(() => showMoveIndicators(), 100);
   </script>
 
 </body>
