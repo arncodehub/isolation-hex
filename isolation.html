@@ -286,7 +286,7 @@
         current.r = oldPos.r;
       }
 
-      const depth = difficulty === "normal" ? 3 : 5;
+      const depth = difficulty === "normal" ? 3 : 4;
       return minimax(true, depth, -Infinity, Infinity).move;
     }
 
@@ -312,7 +312,7 @@
         }
       }
 
-      const depth = difficulty === "normal" ? 2 : 4;
+      const depth = difficulty === "normal" ? 2 : 3;
       return minimaxExplosion(true, depth, -Infinity, Infinity).explosion;
     }
 
@@ -544,11 +544,20 @@
     }
 
     function validMoves(q, r) {
-      const dirs = [
+      // Adjacent directions (original 6)
+      const adjacentDirs = [
         [1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]
       ];
+      
+      // Diagonal directions (6 more for hex grid)
+      const diagonalDirs = [
+        [2, -1], [1, -2], [-1, -1], [-2, 1], [-1, 2], [1, 1]
+      ];
+      
+      const allDirs = [...adjacentDirs, ...diagonalDirs];
       const moves = [];
-      for (const [dq, dr] of dirs) {
+      
+      for (const [dq, dr] of allDirs) {
         const nq = q + dq, nr = r + dr;
         if (tiles.has(`${nq},${nr}`) && !isBlocked(nq, nr) &&
           !(p1.q === nq && p1.r === nr) && !(p2.q === nq && p2.r === nr)) {
