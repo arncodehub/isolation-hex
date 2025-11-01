@@ -507,8 +507,8 @@
     function resetGame() {
       blocked.clear();
       tiles.forEach(t => t.poly.classList.remove("blocked"));
-      p1 = { q: 0, r: 0 };
-      p2 = { q: 2, r: -2 };
+      p1 = { q: -2, r: 0 };
+      p2 = { q: 2, r: 0 };
       turn = 1;
       phase = "move";
       history = [];
